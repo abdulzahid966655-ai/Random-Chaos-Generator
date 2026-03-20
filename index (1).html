@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Random Chaos Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    /* ── Root Variables ── */
+    :root {
+      --bg:        #0a0a0f;
+      --surface:   #12121a;
+      --border:    #1e1e2e;
+      --text:      #e8e8f0;
+      --muted:     #5a5a7a;
+      --roast:     #ff4560;
+      --video:     #00e5ff;
+      --gaming:    #69ff47;
+      --chaos:     #bf5af2;
+      --glow-r:    rgba(255,69,96,0.45);
+      --glow-v:    rgba(0,229,255,0.45);
+      --glow-g:    rgba(105,255,71,0.45);
+      --glow-c:    rgba(191,90,242,0.45);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Space Mono', monospace;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem 4rem;
+      overflow-x: hidden;
+    }
+
+    /* Animated background grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Glowing orbs */
+    body::after {
+      content: '';
+      position: fixed;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(191,90,242,0.07) 0%, transparent 70%);
+      top: -200px; right: -200px;
+      pointer-events: none;
+      z-index: 0;
+      animation: drift 12s ease-in-out infinite alternate;
+    }
+
+    @keyframes drift {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(-60px, 80px) scale(1.15); }
+    }
+
+    /* ── Wrapper ── */
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 680px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2.2rem;
+    }
+
+    /* ── Header ── */
+    header { text-align: center; }
+
+    .title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 10vw, 5.5rem);
+      letter-spacing: 0.04em;
+      line-height: 1;
+      background: linear-gradient(135deg, #ff4560 0%, #bf5af2 50%, #00e5ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 24px rgba(191,90,242,0.4));
+    }
+
+    .subtitle {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Buttons Grid ── */
+    .btn-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.85rem;
+      width: 100%;
+    }
+
+    .btn {
+      position: relative;
+      padding: 0.85rem 1rem;
+      border: 1.5px solid;
+      border-radius: 10px;
+      background: var(--surface);
+      color: inherit;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform 0.18s, box-shadow 0.18s, background 0.18s;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.25s;
+      border-radius: inherit;
+    }
+
+    .btn:hover::before { opacity: 1; }
+    .btn:hover { transform: translateY(-3px) scale(1.02); }
+    .btn:active { transform: translateY(0) scale(0.97); }
+
+    /* Roast */
+    .btn-roast { border-color: var(--roast); color: var(--roast); }
+    .btn-roast::before { background: radial-gradient(ellipse at center, rgba(255,69,96,0.12), transparent); }
+    .btn-roast:hover { box-shadow: 0 0 20px var(--glow-r), 0 0 40px var(--glow-r); }
+
+    /* Video */
+    .btn-video { border-color: var(--video); color: var(--video); }
+    .btn-video::before { background: radial-gradient(ellipse at center, rgba(0,229,255,0.12), transparent); }
+    .btn-video:hover { box-shadow: 0 0 20px var(--glow-v), 0 0 40px var(--glow-v); }
+
+    /* Gaming */
+    .btn-gaming { border-color: var(--gaming); color: var(--gaming); }
+    .btn-gaming::before { background: radial-gradient(ellipse at center, rgba(105,255,71,0.12), transparent); }
+    .btn-gaming:hover { box-shadow: 0 0 20px var(--glow-g), 0 0 40px var(--glow-g); }
+
+    /* Chaos */
+    .btn-chaos {
+      border-color: var(--chaos); color: var(--chaos);
+      grid-column: 1 / -1;
+      font-size: 0.88rem;
+      padding: 1rem;
+    }
+    .btn-chaos::before { background: radial-gradient(ellipse at center, rgba(191,90,242,0.15), transparent); }
+    .btn-chaos:hover { box-shadow: 0 0 24px var(--glow-c), 0 0 60px var(--glow-c); }
+
+    /* Button emoji */
+    .btn-icon { margin-right: 0.4em; font-style: normal; }
+
+    /* ── Output Box ── */
+    .output-wrap {
+      width: 100%;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 1.8rem 1.6rem;
+      min-height: 110px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.35s, box-shadow 0.35s;
+    }
+
+    .output-wrap.active-roast  { border-color: var(--roast);  box-shadow: 0 0 30px rgba(255,69,96,0.15); }
+    .output-wrap.active-video  { border-color: var(--video);  box-shadow: 0 0 30px rgba(0,229,255,0.15); }
+    .output-wrap.active-gaming { border-color: var(--gaming); box-shadow: 0 0 30px rgba(105,255,71,0.15); }
+    .output-wrap.active-chaos  { border-color: var(--chaos);  box-shadow: 0 0 30px rgba(191,90,242,0.2);  }
+
+    /* Label tag */
+    .output-label {
+      position: absolute;
+      top: 0.7rem; left: 0.9rem;
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      opacity: 0.5;
+      font-weight: 700;
+      transition: color 0.3s;
+    }
+
+    #output-text {
+      font-size: clamp(0.9rem, 2.5vw, 1.05rem);
+      line-height: 1.65;
+      text-align: center;
+      color: var(--text);
+      transition: opacity 0.2s;
+    }
+
+    #output-text.fade-out { opacity: 0; transform: translateY(6px); }
+    #output-text.fade-in  { opacity: 1; transform: translateY(0);  transition: opacity 0.3s, transform 0.3s; }
+
+    /* Copy button */
+    .copy-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.35rem 0.8rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+      display: flex; align-items: center; gap: 0.3em;
+    }
+
+    .copy-btn:hover {
+      color: var(--text);
+      border-color: var(--muted);
+      background: rgba(255,255,255,0.04);
+    }
+
+    .copy-btn.copied {
+      color: var(--gaming);
+      border-color: var(--gaming);
+    }
+
+    /* ── Placeholder ── */
+    .placeholder {
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-style: italic;
+      letter-spacing: 0.03em;
+    }
+
+    /* ── Footer ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      margin-top: 1rem;
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+
+    footer span { color: var(--roast); }
+
+    /* ── Chaos flash ── */
+    @keyframes chaosFlash {
+      0%   { opacity: 1; }
+      25%  { opacity: 0.6; filter: hue-rotate(90deg); }
+      50%  { opacity: 1; filter: hue-rotate(180deg); }
+      75%  { opacity: 0.8; filter: hue-rotate(270deg); }
+      100% { opacity: 1; filter: none; }
+    }
+
+    .chaos-anim { animation: chaosFlash 0.5s ease; }
+
+    /* Pop animation for text */
+    @keyframes popIn {
+      0%   { transform: scale(0.92); opacity: 0; }
+      60%  { transform: scale(1.03); }
+      100% { transform: scale(1);    opacity: 1; }
+    }
+
+    .pop { animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+    /* Mobile tweak */
+    @media (max-width: 420px) {
+      .btn-grid { grid-template-columns: 1fr; }
+      .btn-chaos { grid-column: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrapper">
+
+    <!-- Header -->
+    <header>
+      <h1 class="title">Random Chaos Generator</h1>
+      <p class="subtitle">Click and embrace chaos 😈</p>
+    </header>
+
+    <!-- Buttons -->
+    <div class="btn-grid">
+      <button class="btn btn-roast"  onclick="generate('roast')">
+        <span class="btn-icon">🔥</span>Generate Roast
+      </button>
+      <button class="btn btn-video"  onclick="generate('video')">
+        <span class="btn-icon">🎬</span>Video Idea
+      </button>
+      <button class="btn btn-gaming" onclick="generate('gaming')">
+        <span class="btn-icon">🎮</span>Gaming Challenge
+      </button>
+      <button class="btn btn-chaos"  onclick="generate('chaos')">
+        <span class="btn-icon">💀</span>⚡ Chaos Mode ⚡
+      </button>
+    </div>
+
+    <!-- Output -->
+    <div class="output-wrap" id="output-wrap">
+      <span class="output-label" id="output-label">—</span>
+      <p id="output-text">
+        <span class="placeholder">Hit a button. Regret it later.</span>
+      </p>
+      <button class="copy-btn" id="copy-btn" onclick="copyText()" style="display:none">
+        📋 Copy
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer>Made with <span>♥</span> by Akuma</footer>
+
+  <script>
+    /* ─── Content Arrays ─── */
+
+    const roasts = [
+      "You're the human equivalent of a loading screen that never finishes.",
+      "Your WiFi password is probably 'password123' and you're proud of it.",
+      "You peaked in a dream you don't even remember having.",
+      "Your idea of multitasking is messing up two things at the same time.",
+      "Even your search history is embarrassed by you.",
+      "You're not the dumbest person alive, but you better hope they don't die.",
+      "You have the energy of a dead phone at 1% battery.",
+      "Your inner child called — it wants better decisions.",
+      "You look like you cry at mid-tier anime finales. And you should.",
+      "I've seen NPCs with more personality than you.",
+      "Your rizz is somewhere between a broken vending machine and a wet sock.",
+      "You're the type to add 'lol' after saying something genuinely offensive.",
+      "Somewhere, a motivational poster is crying because of you.",
+      "You could speedrun disappointing people without any prior training.",
+      "Your whole personality is the 'Loading...' screen of a soul."
+    ];
+
+    const videos = [
+      "React to AI-generated versions of yourself from 10 different art styles.",
+      "Do a full day using only voice commands — no keyboard, no mouse.",
+      "Speedrun getting banned from as many Discord servers as possible.",
+      "Rate fast food items using only dramatic movie quotes.",
+      "Learn a new skill in 24 hours and document every embarrassing moment.",
+      "Edit a 'day in my life' video but make it look like a Netflix thriller.",
+      "Try every viral life hack from 2015 and see if any actually work.",
+      "Interview your future self using AI voice cloning.",
+      "Play a video game using only keyboard shortcuts — no mouse at all.",
+      "Create a fake documentary about a made-up conspiracy in your town.",
+      "Recreate a famous movie scene using only things in your room.",
+      "Rank every drink in your fridge by how cursed it tastes.",
+      "Build an app in 1 hour. Ship it. See what happens.",
+      "Do a 'silent vlog' — no music, no voiceover. Raw footage only.",
+      "Turn your morning routine into an anime opening sequence edit."
+    ];
+
+    const gaming = [
+      "Complete an entire RPG using only the starting weapon. No upgrades allowed.",
+      "Play your main game but every death = 10 pushups. Stream it.",
+      "Win a match using only the worst-rated loadout on the internet.",
+      "Do a full blind playthrough — no guides, no wikis, no help.",
+      "Play any game using only one hand for an hour.",
+      "Win a game communicating with teammates using only animal sounds.",
+      "Get to the highest rank possible in a game you've never played before.",
+      "Complete a stealth level by being as loud and obvious as possible.",
+      "Beat a boss using the most ridiculous strategy you can think of.",
+      "Play a horror game at max volume, lights off, headphones on — 3AM.",
+      "Do a pacifist run in a game that encourages violence.",
+      "Win a match without ever using your main ability or skill.",
+      "Speedrun character creation — whatever you make, you keep forever.",
+      "Play with inverted controls the entire session. No switching back.",
+      "Beat the final boss of any game on the hardest difficulty, first try only."
+    ];
+
+    const chaos = [
+      "🔥 Roast yourself, then make a video idea about how accurate it was.",
+      "🎮 Do a gaming challenge but narrate it like a nature documentary.",
+      "💀 Your new video idea: 'I let an AI run my life for 48 hours.' Go.",
+      "🌀 Combine ASMR with speedrunning. Post the results. No explanation.",
+      "🧠 Play chess against yourself while eating something disgusting on camera.",
+      "🎬 Make a short film where the villain is your own sleep schedule.",
+      "🔮 Start a cooking channel but only cook things that shouldn't exist.",
+      "👾 Stream yourself doing homework. Treat every wrong answer as a boss fight.",
+      "🐸 Do a mukbang but the food is your emotional damage. Bon appétit.",
+      "🌑 Create a self-help video with advice so bad it's actually genius.",
+      "🎲 Roll a die: even = roast a friend, odd = compliment a stranger online.",
+      "🤖 Let an AI write your next 3 social media posts. Post them unedited.",
+      "💥 Start a podcast where every episode is exactly 47 seconds long.",
+      "🌊 Film yourself reacting to your own old content. Cry if needed.",
+      "⚡ Do a 24-hour challenge where the challenge is 'being normal.' Fail publicly."
+    ];
+
+    /* ─── State ─── */
+    let currentText = '';
+
+    /* ─── Generate ─── */
+    function generate(type) {
+      const maps = { roast: roasts, video: videos, gaming: gaming, chaos: chaos };
+      const labels = {
+        roast:  '🔥 Roast',
+        video:  '🎬 Video Idea',
+        gaming: '🎮 Gaming Challenge',
+        chaos:  '💀 Chaos Mode'
+      };
+
+      const pool = maps[type];
+      const text = pool[Math.floor(Math.random() * pool.length)];
+
+      const outputWrap  = document.getElementById('output-wrap');
+      const outputText  = document.getElementById('output-text');
+      const outputLabel = document.getElementById('output-label');
+      const copyBtn     = document.getElementById('copy-btn');
+
+      /* Update border class */
+      outputWrap.className = 'output-wrap active-' + type;
+
+      /* Fade out */
+      outputText.classList.remove('pop');
+      outputText.style.opacity = '0';
+      outputText.style.transform = 'translateY(6px)';
+
+      setTimeout(() => {
+        currentText = text;
+        outputText.textContent = text;
+        outputLabel.textContent = labels[type];
+        outputLabel.style.color = getColor(type);
+
+        /* Fade in + pop */
+        outputText.style.transition = 'opacity 0.28s ease, transform 0.28s ease';
+        outputText.style.opacity = '1';
+        outputText.style.transform = 'translateY(0)';
+        outputText.classList.add('pop');
+
+        /* Show copy button */
+        copyBtn.style.display = 'flex';
+        copyBtn.classList.remove('copied');
+        copyBtn.textContent = '📋 Copy';
+
+        /* Chaos mode extra flair */
+        if (type === 'chaos') {
+          outputWrap.classList.add('chaos-anim');
+          setTimeout(() => outputWrap.classList.remove('chaos-anim'), 500);
+        }
+      }, 180);
+    }
+
+    function getColor(type) {
+      return { roast: '#ff4560', video: '#00e5ff', gaming: '#69ff47', chaos: '#bf5af2' }[type];
+    }
+
+    /* ─── Copy ─── */
+    function copyText() {
+      if (!currentText) return;
+      navigator.clipboard.writeText(currentText).then(() => {
+        const btn = document.getElementById('copy-btn');
+        btn.textContent = '✅ Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = '📋 Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+  </script>
+
+</body>
+</html>
